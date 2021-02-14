@@ -25,7 +25,7 @@ elseif ~isfield(opts,'verbose')
     opts.verbose = false; % Default is not to display algorithm status messages
 end
 if ~isfield(opts,'findWindowLength')
-    opts.findWindowLength = true; % Default action is to find a suitable window length
+    opts.findWindowLength = false; % Default action is to find a suitable window length
 end
 if ~isfield(opts,'maxOLIt')
     opts.maxOLIt = 100; % Default maximum number of iterations until convergence
