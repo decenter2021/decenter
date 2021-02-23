@@ -1,4 +1,4 @@
-%% Example of sparseEqSolver 
+%% Tutorial of sparseEqSolver 
 %% Generate random matrices A,B,C, and sparsity parttern E 
 n = 5;
 o = 4;

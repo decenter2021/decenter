@@ -63,8 +63,8 @@ for l = 1:opts.maxIt
         (eye(n)-Kinf*C)*P_*transpose(eye(n)-Kinf*C);        
     % Check if new iteration is within the relative minimum improvement
     if abs(trace(Pinf-Pprev))/trace(Pprev)<opts.epsl
-       fprintf("Convergence reached with: epsl = %g | maxIt = %d.\n",opts.epsl,opts.maxIt);
        if opts.verbose
+           fprintf("Convergence reached with: epsl = %g | maxIt = %d.\n",opts.epsl,opts.maxIt);
            fprintf('A total of %d iterations were run.\n',l);
            fprintf('----------------------------------------------------------------------------------\n');
        end

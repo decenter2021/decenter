@@ -32,10 +32,9 @@ end
     Pprev = NaN; % Previous iteration
     it = opts.maxIt;
     while it > 0 % LQ iterations
-        S = Pinf+Q;
-        P_ = A'*S*A;
-        Kinf = (R+B'*S*B)\B'*S*A;
-        Pinf = Kinf'*R*Kinf+(eye(n)-Kinf'*B'/A')*P_*(eye(n)-Kinf'*B'/A')';
+        S = R+B'*Pinf*B;
+        Kinf = S\B'*Pinf*A;
+        Pinf = Q + Kinf'*R*Kinf+(A-B*Kinf)'*Pinf*(A-B*Kinf);     
         it = it-1;
         if (trace(Pinf)-trace(Pprev))/trace(Pprev) < opts.epsl
             if opts.verbose

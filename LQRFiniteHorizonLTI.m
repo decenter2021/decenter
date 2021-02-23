@@ -101,9 +101,9 @@ while  true % Outer loop
     end
     
     % Check if this iteration is within the tolerance
-    if abs(trace(Pinf)-trace(Pprev))/trace(Pprev) < opts.epsl
-        fprintf(sprintf("Convergence reached with: epsl = %g | W = %d | maxOLIt = %d\n",opts.epsl,opts.W,opts.maxOLIt));
+    if abs(trace(Pinf)-trace(Pprev))/trace(Pprev) < opts.epsl  
         if opts.verbose
+            fprintf(sprintf("Convergence reached with: epsl = %g | W = %d | maxOLIt = %d\n",opts.epsl,opts.W,opts.maxOLIt));
             fprintf('A total of %d outer loop iterations were run, out of which %.01f%% converged within\nthe specified minimum improvement.\n',counterOuterLoopIt,100*counterSteadyState/counterOuterLoopIt);
             fprintf('----------------------------------------------------------------------------------\n');
         end

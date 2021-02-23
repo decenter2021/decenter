@@ -60,7 +60,6 @@ set(gca,'FontSize',35);
 ax = gca;
 ax.XGrid = 'on';
 ax.YGrid = 'on';
-%title('Norm of estimation error simulation - centralized gain'); 
 errorPlot = zeros(SimIt,1);
 for j = 1:SimIt
    errorPlot(j,1) =norm(error{1,j}(:,1)); 
