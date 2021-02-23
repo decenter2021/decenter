@@ -13,6 +13,12 @@ function testDECENTER()
         kalmanOneStepLTI(1,1,1,1,1);
         fprintf('kalmanFiniteHorizonLTI: ');
         kalmanFiniteHorizonLTI(1,1,1,1,1);
+        fprintf('LQRCentralizedLTI: ');
+        LQRCentralizedLTI(1,1,1,1);
+        fprintf('LQROneStepLTI: ');
+        LQROneStepLTI(1,1,1,1,1);
+        fprintf('LQRFiniteHorizonLTI: ');
+        LQRFiniteHorizonLTI(1,1,1,1,1);
         fprintf('----------------------------------------------------------------------------------\n');
         fprintf('DECENTER v%s was successfully installed.\n',version);
     catch me
