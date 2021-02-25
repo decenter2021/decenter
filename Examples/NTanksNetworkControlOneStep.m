@@ -43,7 +43,7 @@ for k = 1:simIt
     for j = 1:cte.n/2 % select one ammong 4 different reference waves
        switch rem(j,4)
            % sine wave with:
-           %    - period: 50s
+           %    - period: 2*pi*50s
            %    - amplitude: 10cm
            %    - mean level: 30cm
            case 0   
@@ -59,7 +59,7 @@ for k = 1:simIt
                     ref{1,k}(j) = 20;
                end
            % sine wave with:
-           %    - period: 35s
+           %    - period: 2*pi*35s
            %    - amplitude: 10cm
            %    - mean level: 30cm
            case 2
