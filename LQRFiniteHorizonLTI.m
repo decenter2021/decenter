@@ -5,7 +5,11 @@ function [Kinf,Pinf] = LQRFiniteHorizonLTI(A,B,Q,R,E,opts)
 %           - E: sparsity pattern
 %           - opts: optional input arguments
 %               - epsl: minimum relative improvement on the objective function
-%               - maxIt: maximum number of iterations until convergence 
+%               - maxOLIt: maximum number of iterations until convergence 
+%               - W: starting window length
+%               - maxOLIt: maximum number of outer loop iterations
+%               - findWindowLength: if enabled iterates through window 
+%               length values until convergence is reached
 %               - verbose: display algorithm status messages
 % Output:   - Kinf: nxo steady-state gain matrix
 %           - Pinf: nxn steady-state estimation error covariance matrix

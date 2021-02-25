@@ -31,6 +31,15 @@ opts.W = 40;
 [Kinf,Pinf] = LQRFiniteHorizonLTI(A,B,Q,R,E,opts);
 Kinf
 trace(Pinf)
+
+% alternatively
+opts.verbose = true;
+opts.maxOLIt = 10;
+opts.W = 10;
+opts.findWindowSize = true;
+[Kinf,Pinf] = LQRFiniteHorizonLTI(A,B,Q,R,E,opts);
+Kinf
+trace(Pinf)
  
 %% Simulate error dynamics
 % Generate random initial covariance
