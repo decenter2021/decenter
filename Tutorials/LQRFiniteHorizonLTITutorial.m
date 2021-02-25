@@ -36,7 +36,7 @@ trace(Pinf)
 opts.verbose = true;
 opts.maxOLIt = 10;
 opts.W = 10;
-opts.findWindowSize = true;
+opts.findWindowLength = true;
 [Kinf,Pinf] = LQRFiniteHorizonLTI(A,B,Q,R,E,opts);
 Kinf
 trace(Pinf)
