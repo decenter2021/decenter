@@ -28,14 +28,8 @@ if opts.verbose
     fprintf('----------------------------------------------------------------------------------\n');
 end
 %% Gain computation
-persistent n
-if isempty(n)
-    n = size(system{1,1},1); % Get value of n from the size of A 
-end
-persistent m
-if isempty(m)
-    m = size(system{1,2},2); % Get value of n from the size of B 
-end
+n = size(system{1,1},1); % Get value of n from the size of A 
+m = size(system{1,2},2); % Get value of n from the size of B 
 P = cell(T+1,1); % Initialize cell arrays
 K = cell(T,1);
 P{T+1,1} = system{T+1,3}; % terminal condition  

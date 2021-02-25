@@ -162,7 +162,9 @@ for k = 1:simIt
              uControlDisc{m,k}(uControlDisc{m,k}<0) = 0;
              uControlDisc{m,k}(uControlDisc{m,k}>cte.uMax) = cte.uMax;
              % Simulate nonlinear dynamics
-             nonLinSol{m,1} = ode45(@(t,x) xdotContinuous(x,uControlDisc{m,min(floor(t/cte.dT)+1,round(t_disc(k+1)/cte.dT))},cte),[t_disc(k) t_disc(k+1)],deval(nonLinSol{m,1}, t_disc(k)));
+             nonLinSol{m,1} = ode45(@(t,x) xdotContinuous(x,...
+                 uControlDisc{m,min(floor(t/cte.dT)+1,round(t_disc(k+1)/cte.dT))},cte),...
+                 [t_disc(k) t_disc(k+1)],deval(nonLinSol{m,1}, t_disc(k)));
          end
     else % for the last time-instant
         % compute only the state at the last time-instant
