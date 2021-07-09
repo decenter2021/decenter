@@ -76,7 +76,7 @@ while  true % Outer loop
         else
             C_eq = B'*Q*A*Lambda;
         end
-        % Adjust gain using efficient solver
+        % Adjust gain using efficient solver [1]
         K{k,1} = sparseEqSolver(S,Lambda,...
             C_eq,E);
 
@@ -232,3 +232,8 @@ for l = 1:w
 
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
+

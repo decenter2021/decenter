@@ -75,7 +75,7 @@ while  true % Outer loop
            end
            Lambda = Lambda + transpose(Gamma)*Gamma;
         end      
-        % Adjust gain using efficient solver
+        % Adjust gain using efficient solver [1]
         K{i,1} = sparseEqSolver(Lambda,C*P_*transpose(C)+R,...
             Lambda*P_*transpose(C),E);
         % Old solver commented out
@@ -226,3 +226,8 @@ for l = 1:w
         (eye(n)-K{l,1}*C)*P_*transpose(eye(n)-K{l,1}*C);
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
+
