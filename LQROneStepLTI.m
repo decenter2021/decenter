@@ -32,25 +32,12 @@ end
 
 %% Gain computation
 n = size(A,1); % Get value of n from the size of A 
-m = size(B,2); % Get value of n from the size of B 
 Pinf = Q; % terminal condition
 Pprev = NaN; % Previous iteration
 it = opts.maxIt;
 while it > 0 % LQ iterations
-    Kinf = zeros(m,n);
-    S = R+B'*Pinf*B;
-    for i = 1:n
-        L = zeros(n);
-        L (i,i) = 1; % Generate matrix L_i
-        M = zeros(m);
-        for j = 1:m % Gererate matrix M_i
-            if E(j,i) ~= 0
-                M(j,j) = 1;
-            end
-        end
-        % Compute the ith term of the summation 
-        Kinf = Kinf + (eye(m)-M+M*S*M)\M'*B'*Pinf*A*L';
-    end
+    % Compute gain with efficient algorithm [1]
+    Kinf = sparseEqSolver(R+B'*Pinf*B,eye(n),B'*Pinf*A,E);
     % Update P
     Pinf = Q + Kinf'*R*Kinf+(A-B*Kinf)'*Pinf*(A-B*Kinf);
     it = it-1;
@@ -70,3 +57,8 @@ while it > 0 % LQ iterations
     end
 end    
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
+
