@@ -41,7 +41,7 @@ for l = 1:opts.maxIt
     % Update the covariance of the update step, P_. P is the covariance 
     % matrix after the filtering step.
     P_ = A*Pinf*transpose(A)+Q;
-    % Compute gain matrix 
+    % Compute gain matrix with sparse matrix solver [1]
     Kinf = sparseEqSolver(eye(n),C*P_*transpose(C)+R,P_*transpose(C),E);  
     % Update the covariance matrix after the filtering step
     Pinf = Kinf*R*transpose(Kinf)+...
@@ -64,4 +64,8 @@ for l = 1:opts.maxIt
     Pprev = Pinf;
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
 
