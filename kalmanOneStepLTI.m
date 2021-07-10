@@ -35,29 +35,14 @@ end
 
 %% Gain computation
 n = size(A,1); % Get value of n from the size of A 
-o = size(C,1); % Get value of o from the size of C 
 Pprev = zeros(n,n); % Previous iteration
 Pinf = opts.P0;
 for l = 1:opts.maxIt
     % Update the covariance of the update step, P_. P is the covariance 
     % matrix after the filtering step.
     P_ = A*Pinf*transpose(A)+Q;
-    % Initialise gain matrix 
-    Kinf = zeros(n,o);
-    % Summation to compute the gains
-    for i = 1:n
-        L = zeros(n);
-        L (i,i) = 1; % Generate matrix L_i
-        M = zeros(o);
-        for k = 1:o % Gererate matrix M_i
-           if E(i,k) ~= 0
-               M(k,k) = 1;
-           end
-        end
-        % Compute the ith term of the summation 
-        Kinf = Kinf + (L*P_*transpose(C)*M)/...
-            (eye(o)-M+M*(C*P_*transpose(C)+R)*M);
-    end
+    % Compute gain matrix with sparse matrix solver [1]
+    Kinf = sparseEqSolver(eye(n),C*P_*transpose(C)+R,P_*transpose(C),E);  
     % Update the covariance matrix after the filtering step
     Pinf = Kinf*R*transpose(Kinf)+...
         (eye(n)-Kinf*C)*P_*transpose(eye(n)-Kinf*C);        
@@ -79,4 +64,8 @@ for l = 1:opts.maxIt
     Pprev = Pinf;
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
 

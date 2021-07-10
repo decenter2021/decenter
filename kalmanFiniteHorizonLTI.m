@@ -50,7 +50,7 @@ end
 n = size(A,1); % Get value of n from the size of A 
 % Initialise Finite Horizon with One Step gain and covariance matrices
 [K,P] = OneStepSequenceLTI(A,C,Q,R,E,opts.W,opts.P0);
-Z = vectorZ(vec(E)); % Compute matrix Z
+%Z = vectorZ(vec(E)); % Compute matrix Z
 Pprev = zeros(n,n); % Previous iteration
 Kinf = NaN;
 counterSteadyState = 0; % Counter for the number of iterations for which a steady-state solution was found
@@ -75,7 +75,7 @@ while  true % Outer loop
            end
            Lambda = Lambda + transpose(Gamma)*Gamma;
         end      
-        % Adjust gain using efficient solver
+        % Adjust gain using efficient solver [1]
         K{i,1} = sparseEqSolver(Lambda,C*P_*transpose(C)+R,...
             Lambda*P_*transpose(C),E);
         % Old solver commented out
@@ -226,3 +226,8 @@ for l = 1:w
         (eye(n)-K{l,1}*C)*P_*transpose(eye(n)-K{l,1}*C);
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
+

@@ -5,6 +5,7 @@ function E = sparseEqSolver(A,B,C,E)
 % [X]_ij = 0        if E_ij = 0 
 % where A (nxn), B(oxo), C(nxo), and E(nxo) are known.
 % It is assumed that there is one solution to this equation.
+% Algorithm described in [1].
 % Input:    - A,B,C,E
 %           - E: a matrix that defines the sparsity pattern      
 % Output:   - X: the solution
@@ -39,3 +40,8 @@ for i = 1:n     % For (i,j) in chi
     end
 end
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
+

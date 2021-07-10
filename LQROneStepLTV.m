@@ -29,42 +29,19 @@ if opts.verbose
     fprintf('----------------------------------------------------------------------------------\n');
 end
 %% Gain computation
-persistent n
-if isempty(n)
-    n = size(system{1,1},1); % Get value of n from the size of A 
-end
-persistent m
-if isempty(m)
-    m = size(system{1,2},2); % Get value of n from the size of B 
-end
-persistent M L
-if isempty(M) || isempty(L)
-   M = cell(m,1);
-   L = cell(m,1);
-   for j = 1:n
-        L{j,1} = zeros(n);
-        L{j,1}(j,j) = 1; % Generate matrix L_i
-        M{j,1} = zeros(m);
-        for i = 1:m % Gererate matrix M_i
-            if E(i,j) ~= 0
-                M{j,1}(i,i) = 1;
-            end
-        end
-   end
-end
+n = size(system{1,1},1); % Get value of n from the size of A 
 P = cell(T+1,1); % Initialize cell arrays
 K = cell(T,1);
 P{T+1,1} = system{T+1,3}; % terminal condition  
 for k = T:-1:1
-   K{k,1} = zeros(m,n);
-   S = system{k,4}+system{k,2}'*P{k+1,1}*system{k,2};
-   for j = 1:n
-        % Compute the ith term of the summation   
-        K{k,1} = K{k,1} + ...
-         (eye(m)-M{j,1}+M{j,1}*S*M{j,1})\M{j,1}*system{k,2}'*P{k+1,1}*system{k,1}*L{j,1};
-   end
+   % Compute gain with efficient algorithm [1]
+   K{k,1} = sparseEqSolver(system{k,4}+system{k,2}'*P{k+1,1}*system{k,2},eye(n),system{k,2}'*P{k+1,1}*system{k,1},E);
    % Update P
    P{k,1} = system{k,3}+K{k,1}'*system{k,4}*K{k,1}+...
        (system{k,1}-system{k,2}*K{k,1})'*P{k+1,1}*(system{k,1}-system{k,2}*K{k,1});
 end       
 end
+
+%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+% Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
+% Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
