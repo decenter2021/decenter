@@ -453,7 +453,7 @@ cte.iLQRIt = 100;           % maximum number of iterations of the iLQR alg
 cte.iLQReps = 1e-4;         % parameter for the stopping criterion of iLQR
 end
 
-%% getConstantsNTankNetwork - Description
+%% getEquilibriumMatrices - Description
 % This function computes matrices alpha and beta according to [1] for
 % equilibrium level computation
 % Output:  -alpha, beta: matrices to compute water level 

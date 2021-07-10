@@ -46,7 +46,7 @@ end
 n = size(A,1); % Get value of n from the size of A 
 % Initialise Finite Horizon with One Step gain and covariance matrices
 [K,P] = LQROneStepSequenceLTI(A,B,Q,R,E,opts.W);
-Z = vectorZ(vec(E)); % Compute matrix Z
+%Z = vectorZ(vec(E)); % Compute matrix Z
 Pprev = zeros(n,n); % Previous iteration
 Kinf = NaN;
 counterSteadyState = 0; % Counter for the number of iterations for which a steady-state solution was found
