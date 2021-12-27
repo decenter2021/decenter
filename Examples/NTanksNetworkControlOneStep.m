@@ -11,7 +11,6 @@
 
 %% Initilalize workspace
 clear;
-clear LQROneStepLTV; % clear permanent variables in LQROneStepLTV
 
 %% Set constants and parameters that describe the network and simulation
 % --- Network parameters ---
