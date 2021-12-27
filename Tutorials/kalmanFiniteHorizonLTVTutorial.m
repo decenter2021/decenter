@@ -30,7 +30,7 @@ E = round(rand(n,o));
 %% Synthesize regulator gain using the finite-horizon algorithm
 % Generate random initial predicted covariance for the initial time instant 
 P0 = rand(n,n);
-P0 = P0*P0';
+P0 = 100*(P0*P0');
 % Algorithm paramenters (optional)
 opts.verbose = true;
 opts.epsl = 1e-5;
@@ -48,10 +48,12 @@ Ppred = A0*P0*A0'+Q0;
 for j = 1:T
     % Error dynamics
     if j == 1
-        x{j,1} = (system{j,1}-K{j,1}*system{j,2})*x0;
+        x{j,1} = (eye(n)-K{j,1}*system{j,2})*(A0*x0+...
+                mvnrnd(zeros(n,1),Q0)')-K{j,1}*mvnrnd(zeros(o,1),system{j,4})';
     else
-        x{j,1} = (system{j,1}-K{j,1}*system{j,2})*x{j-1,1};
-    end
+        x{j,1} = (eye(n)-K{j,1}*system{j,2})*(system{j-1,1}*x{j-1,1}+...
+                mvnrnd(zeros(n,1),system{j-1,3})')-K{j,1}*mvnrnd(zeros(o,1),system{j,4})';
+    end 
 end
 
 %% Plot the norm of the estimation error
