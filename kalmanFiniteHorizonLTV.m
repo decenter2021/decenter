@@ -80,12 +80,12 @@ for k = 1:opts.maxOLIt
     % Recompute covariances 
     for i = 1:T
         if i >1
-            P_ = system{i,1}*P{i-1,1}*transpose(system{i,1})+system{i,3};
+            P_ = system{i-1,1}*P{i-1,1}*transpose(system{i-1,1})+system{i-1,3};
         else
             P_ = P0;
         end
-    P{i,1} = K{i,1}*system{i,4}*transpose(K{i,1})+...
-          (eye(n)-K{i,1}*system{i,2})*P_*transpose(eye(n)-K{i,1}*system{i,2});
+        P{i,1} = K{i,1}*system{i,4}*transpose(K{i,1})+...
+            (eye(n)-K{i,1}*system{i,2})*P_*transpose(eye(n)-K{i,1}*system{i,2});
     end 
     % Check convergence
     if k ~= 1
