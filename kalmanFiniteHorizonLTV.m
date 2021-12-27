@@ -2,24 +2,24 @@ function [K,P] = kalmanFiniteHorizonLTV(system,E,T,P0,opts)
 %% Description
 % This function computes the finite-horizon kalman filter gain matrices 
 % subject to a sparsity constraint for all the instants of a window
-% {k,...,k+T-1} according to [1]
+% {1,...,T} according to [1]
 % Input:    - system: Tx4 cell whose rows contain matrices A,C,Q and R
 %             for the whole window, i.e.,
-%               - system{i,1} = A(k+i-1), i = 1,...,T
-%               - system{i,2} = B(k+i-1), i = 1,...,T
-%               - system{i,3} = Q(k+i-1), i = 1,...,T
-%               - system{i,4} = R(k+i-1), i = 1,...,T
+%               - system{i,1} = A(i), i = 1,...,T
+%               - system{i,2} = B(i), i = 1,...,T
+%               - system{i,3} = Q(i), i = 1,...,T
+%               - system{i,4} = R(i), i = 1,...,T
 %           - E: a matrix that defines the sparsity pattern
 %           - T: Finite Horizon time window
-%           - P0 : nxn initial predicted covariance matrix
+%           - P0 : nxn initial predicted covariance matrix, i.e., P(1|0)
 %           - opts: optional input arguments
 %               - epsl: minimum relative improvement on the objective function
 %               - maxOLIt: maximum number of outer loop iterations until convergence 
 %               - verbose: display algorithm status messages
 % Output:   - K: Tx1 cell of gain matrices for all the iterations, i.e.,
-%               K(k+i-1), i = 1,...,T
+%               K(i), i = 1,...,T
 %           - P: Tx1 cell of covariance matrices for all the iterations,
-%           i.e., P(k+i-1), i = 1,...,T
+%           i.e., P(i|i), i = 1,...,T
 %% Argument handling
 if ~exist('opts','var') 
     opts.verbose = false; % Default is not to display algorithm status messages
