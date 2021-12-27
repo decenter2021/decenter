@@ -1,0 +1,12 @@
+----------------------------------------------------------------------------------
+Template of file 'general.txt'.
+Variable notation according to Pedroso et al. (2021) doi:10.1016/j.trc.2021.103412
+J: number of junctions
+L: number of links
+stg: number of stages
+C: control cycle time-step (s)
+H:
+jam: factor c. threshold for definition of a jam
+T: simulation time-step (s)
+----------------------------------------------------------------------------------
+<J>	<L>	<stg>	<C>	<H>	<jam>	<T>

@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------------
+Template of file 'turning_rates_table.txt'.
+Variable notation according to Pedroso et al. (2021) doi:10.1016/j.trc.2021.103412
+T: turning rate matrix defined in Pedroso et al. (2021) doi:10.1016/j.trc.2021.103412
+t_z,0: exit rates (on the last column)
+-------------------------------------------------------------------------------------
+<T_1,1>	<T_1,2>	...	<T_1,Z>	<t_1,0>
+<T_2,1>	<T_2,2>	...	<T_2,Z>	<t_2,0>
+...	...	...	...
+<T_Z,1>	<T_Z,2>	...	<T_Z,Z>	<t_Z,0>
