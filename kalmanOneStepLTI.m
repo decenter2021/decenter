@@ -1,7 +1,7 @@
 function [Kinf,Pinf] = kalmanOneStepLTI(A,C,Q,R,E,opts)
 %% Description
 % This function computes the steady-state distributed one-step Kalman 
-% filter gain 
+% filter gain according to [1]
 % Input:    - A,C,Q,R
 %           - E: a matrix that defines the sparsity pattern
 %           - opts: optional input arguments
@@ -41,7 +41,7 @@ for l = 1:opts.maxIt
     % Update the covariance of the update step, P_. P is the covariance 
     % matrix after the filtering step.
     P_ = A*Pinf*transpose(A)+Q;
-    % Compute gain matrix with sparse matrix solver [1]
+    % Compute gain matrix with sparse matrix solver [2]
     Kinf = sparseEqSolver(eye(n),C*P_*transpose(C)+R,P_*transpose(C),E);  
     % Update the covariance matrix after the filtering step
     Pinf = Kinf*R*transpose(Kinf)+...
@@ -65,7 +65,12 @@ for l = 1:opts.maxIt
 end
 end
 
-%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+%% References
+% [1] Viegas, D., Batista, P., Oliveira, P. and Silvestre, C., 2018. Discrete-time 
+% distributed Kalman filter design for formations of autonomous vehicles. 
+% Control Engineering Practice, 75, pp.55-68.
+
+% [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
 

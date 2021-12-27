@@ -7,6 +7,7 @@
 % the one-step method and comparing its performance with the centralized
 % solution. In addition, to take into consideration the nonlinearity of the
 % dynamics of this network, an iLQR scheme is used.
+% Proposed in [1]
 
 %% Initilalize workspace
 clear;
@@ -633,6 +634,6 @@ end
 end
 
 %% References
-% [1] L. Pedroso, and P. Batista (xxx), Discrete-time decentralized linear 
-% quadratic control for linear time-varying systems, Int J Robust Nonlinear
-% Control, xxx;xx:x?x. [Submitted to journal]
+% [1] Pedroso L, Batista P. Discrete?time decentralized linear quadratic 
+% control for linear time?varying systems. International Journal of Robust 
+% and Nonlinear Control. 2021 Sep 8. https://doi.org/10.1002/rnc.5772

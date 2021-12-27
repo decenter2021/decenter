@@ -1,5 +1,5 @@
 function testDECENTER()
-    version = '1.1.0';
+    version = '1.1.1';
     fprintf('----------------------------------------------------------------------------------\n');
     fprintf('Testing installation of DECENTER v%s.\n',version);
     currentDir = pwd;

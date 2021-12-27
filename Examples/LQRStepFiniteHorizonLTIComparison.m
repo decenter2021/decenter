@@ -1,5 +1,6 @@
 %% Comparison of regulation performance between centralized, one-step, and
 % finite-horizon methods - Monte Carlo simulations
+% Methods developed in [1]
 %% Generate random LTI system
 n = 10;
 m = 6;
@@ -80,3 +81,7 @@ fprintf("Projected\t%.2f\t%.2f\t%.2f\n",...
     alpha*trace(PC),alpha*trace(POS),alpha*trace(PFH));
 fprintf("Monte-Carlo\t%.2f\t%.2f\t%.2f\n",J(1),J(2),J(3));
 
+%% References
+% [1] Viegas D, Batista P, Oliveira P, Silvestre C. Distributed controller design 
+% and performance optimization for discrete-time linear systems. Optim Control 
+% Appl Meth. 2020;1-18. https://doi.org/10.1002/oca.2669

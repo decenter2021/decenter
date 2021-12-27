@@ -1,7 +1,7 @@
 function [Kinf,Pinf] = kalmanFiniteHorizonLTI(A,C,Q,R,E,opts)
 %% Description
 % This function computes the steady state distributed finite-horizon Kalman
-% filter gain 
+% filter gain according to [1]
 % Input:    - A,C,Q,R
 %           - E: a matrix that defines the sparsity pattern
 %           - opts: optional input arguments
@@ -75,7 +75,7 @@ while  true % Outer loop
            end
            Lambda = Lambda + transpose(Gamma)*Gamma;
         end      
-        % Adjust gain using efficient solver [1]
+        % Adjust gain using efficient solver [2]
         K{i,1} = sparseEqSolver(Lambda,C*P_*transpose(C)+R,...
             Lambda*P_*transpose(C),E);
         % Old solver commented out
@@ -227,7 +227,12 @@ for l = 1:w
 end
 end
 
-%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+%% References
+% [1] Viegas, D., Batista, P., Oliveira, P. and Silvestre, C., 2018. Discrete-time 
+% distributed Kalman filter design for formations of autonomous vehicles. 
+% Control Engineering Practice, 75, pp.55-68.
+
+% [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
 

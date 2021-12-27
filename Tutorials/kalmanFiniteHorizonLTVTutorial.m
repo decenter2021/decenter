@@ -1,4 +1,5 @@
 %% Tutorial of kalmanFiniteHorizonLTV
+% Proposed in [1]
 %% Synthetic random system
 T = 50;
 n = 5;
@@ -70,3 +71,9 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\mathbf{x}_{FH}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Pedroso L, Batista P, Oliveira P, Silvestre C. Discrete-time distributed
+% Kalman filter design for networks of interconnected systems with linear 
+% time-varying dynamics. International Journal of Systems Science. 2021; 
+% https://doi.org/10.1080/00207721.2021.2002461

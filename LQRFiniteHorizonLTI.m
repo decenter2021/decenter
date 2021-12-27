@@ -1,6 +1,7 @@
 function [Kinf,Pinf] = LQRFiniteHorizonLTI(A,B,Q,R,E,opts)
 %% Description
 % This function computes the steady-state finite-horizon LQR regulator gain
+% according to [1]
 % Input:    - A,B,Q,R
 %           - E: sparsity pattern
 %           - opts: optional input arguments
@@ -76,7 +77,7 @@ while  true % Outer loop
         else
             C_eq = B'*Q*A*Lambda;
         end
-        % Adjust gain using efficient solver [1]
+        % Adjust gain using efficient solver [2]
         K{k,1} = sparseEqSolver(S,Lambda,...
             C_eq,E);
 
@@ -233,7 +234,11 @@ for l = 1:w
 end
 end
 
-%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+%% References
+% [1] Viegas D, Batista P, Oliveira P, Silvestre C. Distributed controller design 
+% and performance optimization for discrete-time linear systems. Optim Control 
+% Appl Meth. 2020;1-18. https://doi.org/10.1002/oca.2669
+
+% [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
-

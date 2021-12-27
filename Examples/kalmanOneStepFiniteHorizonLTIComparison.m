@@ -1,5 +1,6 @@
 %% Comparison of estimation performance between centralized, one-step, and
 % finite-horizon methods - Monte Carlo simulations
+% Methods developed in [1]
 %% Generate random LTI system
 n = 10;
 o = 6;
@@ -96,3 +97,8 @@ ylabel('$\mathrm{tr}(\mathbf{P}_{MC}(k))$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 legend('Cent.', 'OS', 'FH','Location','Best');
 hold off;
+
+%% References
+% [1] Viegas, D., Batista, P., Oliveira, P. and Silvestre, C., 2018. Discrete-time 
+% distributed Kalman filter design for formations of autonomous vehicles. 
+% Control Engineering Practice, 75, pp.55-68.
