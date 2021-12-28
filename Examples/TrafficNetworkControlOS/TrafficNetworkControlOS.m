@@ -13,7 +13,7 @@
 %% Initilalize workspace
 clear;
 
-%% Import LTI model of Chania network
+%% Import traffic network model
 model = modelSynthesis("./data/");
 
 %% Modal decomposition as detailed in [1]
@@ -601,4 +601,4 @@ end
 
 % [3] Helgason, R., Kennington, J., Lall, H., 1980. A polynomially bounded 
 % algorithm for a singly constrained quadratic program. Math. Program. 
-% 18 (1), 338?343.
+% 18 (1), 338-343.
