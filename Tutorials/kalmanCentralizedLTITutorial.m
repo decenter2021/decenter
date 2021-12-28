@@ -1,5 +1,5 @@
 %% Example of kalmanCentralizedLTI
-%% Synthetic system of Viegas et al. (2018) 
+%% Synthetic system of Viegas et al. (2018) [1]
 n = 5;
 o = 4;
 A = [0.152  0.092   0.235   0.642   0.506;
@@ -64,3 +64,8 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\hat{\mathbf{x}_C}(k|k)-\mathbf{x}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Viegas, D., Batista, P., Oliveira, P. and Silvestre, C., 2018. Discrete-time 
+% distributed Kalman filter design for formations of autonomous vehicles. 
+% Control Engineering Practice, 75, pp.55-68.

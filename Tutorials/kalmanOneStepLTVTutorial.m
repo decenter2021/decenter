@@ -1,4 +1,5 @@
 %% Tutorial of kalmanOneStepLTV
+% Proposed in [1]
 %% Synthetic random system
 T = 50;
 n = 5;
@@ -29,7 +30,7 @@ E = round(rand(n,o));
 %% Simulate error dynamics
 % Generate random initial predicted covariance for the initial time instant 
 P0 = rand(n,n);
-P0 = P0*P0';
+P0 = 100*(P0*P0');
 % Initialise error cell
 x = cell(T,1);
 % Generate random initial error
@@ -41,9 +42,11 @@ for j = 1:T
     [K,Ppred,~] = kalmanOneStepLTV(system(j,:),E,Ppred);
     % Error dynamics
     if j == 1
-        x{j,1} = (system{j,1}-K*system{j,2})*x0;
+        x{j,1} = (eye(n)-K*system{j,2})*(A0*x0+...
+                mvnrnd(zeros(n,1),Q0)')-K*mvnrnd(zeros(o,1),system{j,4})';
     else
-        x{j,1} = (system{j,1}-K*system{j,2})*x{j-1,1};
+        x{j,1} = (eye(n)-K*system{j,2})*(system{j-1,1}*x{j-1,1}+...
+                mvnrnd(zeros(n,1),system{j-1,3})')-K*mvnrnd(zeros(o,1),system{j,4})';
     end 
 end
 
@@ -64,3 +67,9 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\mathbf{x}_{OS}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Pedroso L, Batista P, Oliveira P, Silvestre C. Discrete-time distributed
+% Kalman filter design for networks of interconnected systems with linear 
+% time-varying dynamics. International Journal of Systems Science. 2021; 
+% https://doi.org/10.1080/00207721.2021.2002461

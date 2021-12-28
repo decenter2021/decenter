@@ -1,4 +1,5 @@
 %% Tutorial of kalmanFiniteHorizonLTV
+% Proposed in [1]
 %% Synthetic random system
 T = 50;
 n = 5;
@@ -29,7 +30,7 @@ E = round(rand(n,o));
 %% Synthesize regulator gain using the finite-horizon algorithm
 % Generate random initial predicted covariance for the initial time instant 
 P0 = rand(n,n);
-P0 = P0*P0';
+P0 = 100*(P0*P0');
 % Algorithm paramenters (optional)
 opts.verbose = true;
 opts.epsl = 1e-5;
@@ -47,10 +48,12 @@ Ppred = A0*P0*A0'+Q0;
 for j = 1:T
     % Error dynamics
     if j == 1
-        x{j,1} = (system{j,1}-K{j,1}*system{j,2})*x0;
+        x{j,1} = (eye(n)-K{j,1}*system{j,2})*(A0*x0+...
+                mvnrnd(zeros(n,1),Q0)')-K{j,1}*mvnrnd(zeros(o,1),system{j,4})';
     else
-        x{j,1} = (system{j,1}-K{j,1}*system{j,2})*x{j-1,1};
-    end
+        x{j,1} = (eye(n)-K{j,1}*system{j,2})*(system{j-1,1}*x{j-1,1}+...
+                mvnrnd(zeros(n,1),system{j-1,3})')-K{j,1}*mvnrnd(zeros(o,1),system{j,4})';
+    end 
 end
 
 %% Plot the norm of the estimation error
@@ -70,3 +73,9 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\mathbf{x}_{FH}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Pedroso L, Batista P, Oliveira P, Silvestre C. Discrete-time distributed
+% Kalman filter design for networks of interconnected systems with linear 
+% time-varying dynamics. International Journal of Systems Science. 2021; 
+% https://doi.org/10.1080/00207721.2021.2002461

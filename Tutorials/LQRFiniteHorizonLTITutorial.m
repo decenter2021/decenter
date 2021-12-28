@@ -1,4 +1,5 @@
 %% Example of LQRFiniteHorizonLTI
+% Method developed in [1]
 %% Synthetic random system
 n = 5;
 m = 3;
@@ -75,3 +76,8 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\mathbf{x}_{FH}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Viegas D, Batista P, Oliveira P, Silvestre C. Distributed controller design 
+% and performance optimization for discrete-time linear systems. Optim Control 
+% Appl Meth. 2020;1-18. https://doi.org/10.1002/oca.2669

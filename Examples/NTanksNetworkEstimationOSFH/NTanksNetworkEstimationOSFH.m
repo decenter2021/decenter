@@ -4,7 +4,7 @@
 % to study the estimation performance). In this script observers of the LTV
 % system are also implemented. It includes a centralized observer and two 
 % distributed observers, whose gains are computed using the One Step and 
-% Finite Horizon Algorithms. 
+% Finite Horizon Algorithms proposed in [1]
 
 %% Descentralization scheme
 % The distributed scheme presented assumes the control vector is determined
@@ -532,4 +532,10 @@ for i = cte.n/2+2:cte.n
     B(i,j) =  (1-cte.gamma(j))*cte.k(j)/cte.A(i);
 end
 end
+
+%% References
+% [1] Pedroso L, Batista P, Oliveira P, Silvestre C. Discrete-time distributed
+% Kalman filter design for networks of interconnected systems with linear 
+% time-varying dynamics. International Journal of Systems Science. 2021; 
+% https://doi.org/10.1080/00207721.2021.2002461
 

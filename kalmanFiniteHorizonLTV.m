@@ -2,24 +2,24 @@ function [K,P] = kalmanFiniteHorizonLTV(system,E,T,P0,opts)
 %% Description
 % This function computes the finite-horizon kalman filter gain matrices 
 % subject to a sparsity constraint for all the instants of a window
-% {k,...,k+T-1}
+% {1,...,T} according to [1]
 % Input:    - system: Tx4 cell whose rows contain matrices A,C,Q and R
 %             for the whole window, i.e.,
-%               - system{i,1} = A(k+i-1), i = 1,...,T
-%               - system{i,2} = B(k+i-1), i = 1,...,T
-%               - system{i,3} = Q(k+i-1), i = 1,...,T
-%               - system{i,4} = R(k+i-1), i = 1,...,T
+%               - system{i,1} = A(i), i = 1,...,T
+%               - system{i,2} = B(i), i = 1,...,T
+%               - system{i,3} = Q(i), i = 1,...,T
+%               - system{i,4} = R(i), i = 1,...,T
 %           - E: a matrix that defines the sparsity pattern
 %           - T: Finite Horizon time window
-%           - P0 : nxn initial predicted covariance matrix
+%           - P0 : nxn initial predicted covariance matrix, i.e., P(1|0)
 %           - opts: optional input arguments
 %               - epsl: minimum relative improvement on the objective function
 %               - maxOLIt: maximum number of outer loop iterations until convergence 
 %               - verbose: display algorithm status messages
 % Output:   - K: Tx1 cell of gain matrices for all the iterations, i.e.,
-%               K(k+i-1), i = 1,...,T
+%               K(i), i = 1,...,T
 %           - P: Tx1 cell of covariance matrices for all the iterations,
-%           i.e., P(k+i-1), i = 1,...,T
+%           i.e., P(i|i), i = 1,...,T
 %% Argument handling
 if ~exist('opts','var') 
     opts.verbose = false; % Default is not to display algorithm status messages
@@ -71,7 +71,7 @@ for k = 1:opts.maxOLIt
             end
             Lambda = Lambda + transpose(Gamma)*Gamma;
         end     
-        % Adjust gain using efficient solver [1]
+        % Adjust gain using efficient solver [2]
         K{i,1} = sparseEqSolver(Lambda,system{i,2}*P_*transpose(system{i,2})+system{i,4},Lambda*P_*transpose(system{i,2}),E);
         % Old solver commented 
         % K{i,1} = unvec(transpose(Z)/(Z*(kron(system{i,2}*P_*transpose(system{i,2})+system{i,4},Lambda))...
@@ -80,12 +80,12 @@ for k = 1:opts.maxOLIt
     % Recompute covariances 
     for i = 1:T
         if i >1
-            P_ = system{i,1}*P{i-1,1}*transpose(system{i,1})+system{i,3};
+            P_ = system{i-1,1}*P{i-1,1}*transpose(system{i-1,1})+system{i-1,3};
         else
             P_ = P0;
         end
-    P{i,1} = K{i,1}*system{i,4}*transpose(K{i,1})+...
-          (eye(n)-K{i,1}*system{i,2})*P_*transpose(eye(n)-K{i,1}*system{i,2});
+        P{i,1} = K{i,1}*system{i,4}*transpose(K{i,1})+...
+            (eye(n)-K{i,1}*system{i,2})*P_*transpose(eye(n)-K{i,1}*system{i,2});
     end 
     % Check convergence
     if k ~= 1
@@ -157,6 +157,12 @@ function Z = vectorZ(vecE)
     end
 end
 
-%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+%% References
+% [1] Pedroso L, Batista P, Oliveira P, Silvestre C. Discrete-time distributed
+% Kalman filter design for networks of interconnected systems with linear 
+% time-varying dynamics. International Journal of Systems Science. 2021; 
+% https://doi.org/10.1080/00207721.2021.2002461
+
+% [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497

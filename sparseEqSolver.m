@@ -41,6 +41,7 @@ for i = 1:n     % For (i,j) in chi
 end
 end
 
+%% References
 %[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497

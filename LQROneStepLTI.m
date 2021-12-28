@@ -1,6 +1,7 @@
 function [Kinf,Pinf] = LQROneStepLTI(A,B,Q,R,E,opts)
 %% Description
 % This function computes the steady-state one-step LQR regulator gain
+% according to [1]
 % Input:    - A,B,Q,R
 %           - E: sparsity pattern
 %           - opts: optional input arguments
@@ -36,7 +37,7 @@ Pinf = Q; % terminal condition
 Pprev = NaN; % Previous iteration
 it = opts.maxIt;
 while it > 0 % LQ iterations
-    % Compute gain with efficient algorithm [1]
+    % Compute gain with efficient algorithm [2]
     Kinf = sparseEqSolver(R+B'*Pinf*B,eye(n),B'*Pinf*A,E);
     % Update P
     Pinf = Q + Kinf'*R*Kinf+(A-B*Kinf)'*Pinf*(A-B*Kinf);
@@ -58,7 +59,12 @@ while it > 0 % LQ iterations
 end    
 end
 
-%[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
+%% References
+% [1] Viegas D, Batista P, Oliveira P, Silvestre C. Distributed controller design 
+% and performance optimization for discrete-time linear systems. Optim Control 
+% Appl Meth. 2020;1-18. https://doi.org/10.1002/oca.2669
+
+% [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
 % Theory" Mathematics 9, no. 13: 1497. https://doi.org/10.3390/math9131497
 

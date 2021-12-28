@@ -1,0 +1,8 @@
+----------------------------------------------------------------------------------------------------------
+Template of file 'junctions_table.txt'.
+Variable notation according to Pedroso et al. (2021) doi:10.1016/j.trc.2021.103412
+----------------------------------------------------------------------------------------------------------
+<Lost time at junction 1>	<Number of stages at junction 1>	<minimum green time at junction 1>
+<Lost time at junction 2>	<Number of stages at junction 2>	<minimum green time at junction 2>
+...				...					...
+<Lost time at junction J>	<Number of stages at junction J>	<minimum green time at junction J>

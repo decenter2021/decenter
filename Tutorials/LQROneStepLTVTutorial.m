@@ -1,4 +1,5 @@
 %% Tutorial of LQROneStepLTV
+% Proposed in [1]
 %% Synthetic random system
 T = 50;
 n = 5;
@@ -63,3 +64,8 @@ set(gcf, 'Position', [100 100 900 550]);
 ylabel('$\|\mathbf{x}_{OS}(k)\|_2$','Interpreter','latex');
 xlabel('$k$','Interpreter','latex');
 hold off;
+
+%% References
+% [1] Pedroso L, Batista P. Discrete?time decentralized linear quadratic 
+% control for linear time?varying systems. International Journal of Robust 
+% and Nonlinear Control. 2021 Sep 8. https://doi.org/10.1002/rnc.5772
