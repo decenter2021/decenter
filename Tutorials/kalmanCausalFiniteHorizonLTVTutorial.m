@@ -152,6 +152,9 @@ P0 = 100*eye(n);
 % Parameters of CFH method
 W = 4;
 opts.verbose = true;
+opts.epsl = 1e-4;
+opts.alpha = 0.1;
+opts.maxOLIt = 1e4;
 % Initialise error cell
 x = cell(T,1);
 P = cell(T,1);
@@ -177,7 +180,7 @@ for k = 1:T
         x_aux = x{CFH_tau-1,1}; % Get estimate at the beggining of the window
     end
     % Compute the Finite Horizon gains for the window of past instants
-    [CFH_K,CFH_P] = kalmanFiniteHorizonLTV(system(CFH_tau:k,:),E,CFH_W,CFH_Ppred0);
+    [CFH_K,CFH_P] = kalmanCausalFiniteHorizonLTV(system(CFH_tau:k,:),E,CFH_W,CFH_Ppred0,opts);
     % Covariance at the end of the CFH window is the  becomes the final 
     % covariance for instant k
     P{k,1} = CFH_P{end,1};
