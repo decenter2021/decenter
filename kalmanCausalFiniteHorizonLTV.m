@@ -1,8 +1,8 @@
 function [K,P] = kalmanCausalFiniteHorizonLTV(system,E,T,P0,opts)
 %% Description
-% This function computes the finite-horizon kalman filter gain matrices 
-% subject to a sparsity constraint for all the instants of a window
-% {k,...,k+T-1}
+% This function computes the causal finite-horizon kalman filter gain 
+% matrices subject to a sparsity constraint for all the instants of a 
+% window {k,...,k+T-1}
 % Input:    - system: Tx4 cell whose rows contain matrices A,C,Q and R
 %             for the whole window, i.e.,
 %               - system{i,1} = A(k+i-1), i = 1,...,T
@@ -14,6 +14,7 @@ function [K,P] = kalmanCausalFiniteHorizonLTV(system,E,T,P0,opts)
 %           - P0 : nxn initial predicted covariance matrix
 %           - opts: optional input arguments
 %               - epsl: minimum relative improvement on the objective function
+%               - alpha: ratio of weighting geometric progression
 %               - maxOLIt: maximum number of outer loop iterations until convergence 
 %               - verbose: display algorithm status messages
 % Output:   - K: Tx1 cell of gain matrices for all the iterations, i.e.,
@@ -33,11 +34,11 @@ if ~isfield(opts,'epsl')
     opts.epsl = 1e-5; % Default minimum relative improvement on the objective function
 end
 if ~isfield(opts,'alpha')
-    opts.alpha = 1e-1; % Default minimum relative improvement on the objective function
+    opts.alpha = 1e-1; % Default ratio of weighting geometric progression
 end
 if opts.verbose
     fprintf('----------------------------------------------------------------------------------\n');
-    fprintf('Running causal finite-horizon algorithm with:\nepsl = %g | maxOLIt = %d.\n',opts.epsl,opts.maxOLIt);
+    fprintf('Running causal finite-horizon algorithm with:\nepsl = %g | alpha = %g | maxOLIt = %d.\n',opts.epsl,opts.alpha,opts.maxOLIt);
 end
 %% Gain Computation
 n = size(system{1,2},2); % Get value of n from the size of A 
@@ -76,9 +77,6 @@ for k = 1:opts.maxOLIt
         end     
         % Adjust gain using efficient solver [1]
         K{i,1} = sparseEqSolver(Lambda,system{i,2}*P_*transpose(system{i,2})+system{i,4},Lambda*P_*transpose(system{i,2}),E);
-        % Old solver commented 
-        % K{i,1} = unvec(transpose(Z)/(Z*(kron(system{i,2}*P_*transpose(system{i,2})+system{i,4},Lambda))...
-        %    *transpose(Z))*Z*vec(Lambda*P_*transpose(system{i,2})),n);
     end
     % Recompute covariances 
     for i = 1:T
@@ -106,58 +104,13 @@ for k = 1:opts.maxOLIt
         elseif k == opts.maxOLIt
             if opts.verbose
                 fprintf("Causal finite-horizon algorithm was unable to reach convergence with the specified\nparameters: epsl = %g | T = %d | maxOLIt = %d\n",opts.epsl,T,opts.maxOLIt);
-                fprintf("Sugested actions:\n- Manually tune \'epsl' and \'maxOLIt\' (in this order);\n- Increase \'epsl\', the minimum relative improvement on the objective function\noptimization problem.\n- Increase \'maxOLIt\', the maximum number of outer loop iterations.\n");
+                fprintf("Sugested actions:\n- Manually tune \'epsl', \'alpha\' and \'maxOLIt\' (in this order);\n- Increase \'alpha\', the ratio of weighting geometric progression\n- Increase \'epsl\', the minimum relative improvement on the objective function\noptimization problem.\n- Increase \'maxOLIt\', the maximum number of outer loop iterations.\n");
                 fprintf('----------------------------------------------------------------------------------\n');
             end
         end
     end
     PprevIt = P;
 end
-end
-
-%% Auxiliary functions
-
-% Function that computes the vectorisation of a matrix
-% Input:    - in: matrix to be vectorised
-% Output:   - out: vec(in) 
-function out = vec(in)
-    out = zeros(size(in,2)*size(in,1),1);
-    for j = 1:size(in,2)
-       for i = 1:size(in,1)
-           out((j-1)*size(in,1)+i) = in(i,j);
-       end
-    end
-end
-
-% Function that returns a matrix given its vectorisation and number of rows
-% Input:    - in: vectorisation of a matrix
-%           - n: number of rows of the matrix whose vectorisation is
-%             input variable in
-% Output:   - out: matrix with n rows whose vectorisation is input variable
-%             in 
-function out = unvec(in,n)
-    out = zeros(n,size(in,1)/n);
-    for j = 1:size(in,1)
-       out(rem(j-1,n)+1, round(floor((j-1)/n))+1) = in(j); 
-    end
-end
-
-% Function which computes matrix Z such that Z*vec(K) contains the non-zero
-% elements of K according to the desired sparsity pattern
-% Input:    - vecE: the vectorisation of the matrix that defines the
-%             sparsity patern
-% Output:   - Z
-function Z = vectorZ(vecE)
-    vecE = vecE~=0; % Normalise the sparsity pattern to a logical array
-    Z = zeros(sum(vecE),size(vecE,1)); % Initialise matrix Z
-    nZeros = 0;
-    for i = 1:size(vecE,1)
-       if vecE(i) ~= 0
-           Z(i-nZeros,i) = 1; 
-       else
-           nZeros = nZeros+1;
-       end     
-    end
 end
 
 %[1] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
