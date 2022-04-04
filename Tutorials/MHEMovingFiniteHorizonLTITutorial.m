@@ -35,16 +35,18 @@ W = 5;
 [Kinf,Pinf] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts);
 
 Kinf 
-trace(Pinf) % 17.8864
+trace(Pinf)
 
 %% Gain synthesis with 1000 randmoly generated matrices P(0|0|0)
-noP0 = 1000;
+noP0 = 500;
 opts.verbose = false;
 opts.maxIt = 100;
-opts.epsl_inf = 1e-5;
+opts.epsl_inf = 1e-4;
 W = 5;
 
+% Synthezize several sequences
 Pinf = inf(size(A));
+rng(0); % For consistency
 for i = 1:noP0
     aux = 2*(rand(size(A))-0.5);
     opts.P0 = aux*aux';
@@ -60,7 +62,7 @@ trace(Pinf)
 
 %% Simulate error dynamics
 % Simulation span
-T = 1000;
+T = 100;
 % Initial estimation erro covariance matrix
 P0 = 100*eye(n);
 % Initialise error cell
