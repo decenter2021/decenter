@@ -26,7 +26,7 @@ E = [1   0   1   1;
      1   1   1   0;
      1   1   0   1];
 
- %% Gain synthesys (synthesis with P(0|0|0) = 0)
+ %% Gain synthesis (synthesis with P(0|0|0) = 0)
 opts.verbose = true;
 opts.maxIt = 100;
 opts.P0 = zeros(size(A));
@@ -37,7 +37,7 @@ W = 5;
 Kinf 
 trace(Pinf)
 
-%% Gain synthesis with 1000 randmoly generated matrices P(0|0|0)
+%% Gain synthesis with 1000 randomly generated matrices P(0|0|0)
 noP0 = 500;
 opts.verbose = false;
 opts.maxIt = 100;
@@ -110,7 +110,7 @@ for k = 1:T
     end
 end
 
-%% Plot the norm of the estimation error
+%% Plot the norm of the estimation error and covariance trace
 % Plot the ||x||_2 vs instant of the simulation 
 figure;
 hold on;
