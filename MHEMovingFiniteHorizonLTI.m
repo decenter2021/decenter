@@ -27,7 +27,7 @@ if ~isfield(opts,'maxIt')
     opts.maxIt = 100; % Default maximum number of iterations until convergence
 end
 if ~isfield(opts,'epsl_inf')
-    opts.epsl_inf = 1e-5; % Default minimum relative improvement on the objective function
+    opts.epsl_inf = 1e-4; % Default minimum relative improvement on the objective function
 end
 if ~isfield(opts,'epsl')
     opts.epsl = opts.epsl_inf/10; % Default minimum relative improvement on the objective function
