@@ -13,9 +13,13 @@
 clearvars -except matlab_check; % Clear workspace variables
 % Add source of orbital dynamics utilities
 addpath('./src');
-addpath('../src-osculating2mean');
+% Add source of osculating2mean library
+% https://github.com/decenter2021/osculating2mean
+addpath('./osculating2mean');
+cd './osculating2mean'; make_osculating2mean; cd '..'
 % Add source of tudat feedback matlab server class
-addpath('../src-tudat'); 
+% https://github.com/decenter2021/tudat-matlab-thrust-feedback
+addpath('./tudat-matlab-thrust-feedback/src-tudat-matlab-thrust-feedback'); 
 tic; % Log the execution time
 
 %% Define execution options 
@@ -137,6 +141,27 @@ if ~tudatSimulation
         u{i,1} = zeros(m_single,ItSim-1);
         x{i,1}(:,1) = x0(:,i);
     end
+    % Simulation environment 
+ 	env.mu = 3.986004418e14; %(m^3 s^-2)
+    env.RE = 6371e3; %(m)
+    env.J2 = 1082.6267e-6;
+    env.wE = 7.2921150e-5; %(rad/s)
+    % Atmosphere cf. Table 7-4 Vallado1997
+    env.h0 = 500e3; %(m)
+    env.rho0 = 6.967e-13; %(Kg/m^3)
+    env.H = 63.822e3; %(m)
+    % Satellite
+    argv = getFloatMacrosFromCHeader(headerParametersFilepath,...
+    {'SAT_Cd';'SAT_Ad'});
+    env.Cd = argv(1);
+    env.Ad = argv(2); % (m^2)
+    % Thrust
+    argv = getFloatMacrosFromCHeader(headerParametersFilepath,...
+    {'SAT_Ct1';'SAT_ISP';'SAT_g0'});
+    env.Ct1 =  argv(1); % (N)
+    env.Isp=  argv(2); % (s)
+    env.g0 =  argv(3); % (ms^-2)
+    env.fs = 1;
 else
     % Satate backup if tudat simulation or MATLAB crash
     x_backup = zeros(7*N,ItSim);
@@ -233,7 +258,7 @@ while(1)
         % Propagate orbit
         %for i = 1:N
         parfor i = 1:N
-            x{i,1}(:,it+1) = propagateSatellite(x{i,1}(:,it),u{i,1}(:,it),Tctrl);
+            x{i,1}(:,it+1) = propagateSatellite(x{i,1}(:,it),u{i,1}(:,it),Tctrl,env);
         end
     end
 end

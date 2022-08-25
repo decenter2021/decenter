@@ -3,18 +3,20 @@
 %% Init 
 clear; % Clear workspace variables
 % Add source of orbital dynamics utilities
-addpath('../src','-frozen');
-addpath('../src-osculating2mean','-frozen');
+addpath('./src');
+% Add source of osculating2mean library
+% https://github.com/decenter2021/osculating2mean
+addpath('./osculating2mean');
+cd './osculating2mean'; make_osculating2mean; cd '..'
 % Add source of tudat feedback matlab server class
-addpath('../src-tudat','-frozen');
+% https://github.com/decenter2021/tudat-matlab-thrust-feedback
+addpath('./tudat-matlab-thrust-feedback/src-tudat-matlab-thrust-feedback'); 
 
 %% Define execution options 
 % Turn off tudat simulation for debug
 tudatSimulation = true;
 % Parameter upload from C header
 headerParametersFilepath = 'constellationParameters.h';
-%simulationOutputFilepath = './archive/2022_06_07_06_53_06_new_osculating2mean/output.mat';
-%simulationOutputFilepath = './archive/tuning/0_1/2022_06_12_18_44_35_T700_d70/output.mat';
 simulationOutputFilepath = './archive/full_simulation/output.mat';
 
 %% Load data
@@ -446,6 +448,3 @@ legend({'$e$','$i-\bar{i}$'},'Interpreter','latex','Location','best')
 
 t_last3orbits = round((9*2*pi/n)/Tctrl):round((12*2*pi/n)/Tctrl);
 ss_mae = mean(globalError(:,t_last3orbits)') % a
-
-
-

@@ -1,14 +1,10 @@
-
-# Still to improve:
-# Variable tudat-bundle-app-dir is not necessary for compilation, we may just append it to the other variable of the tudat-bundle
-
 # -------------- Set paths -----------------------------------------------------
 # Matlab dirs
 matlab-exe := /usr/local/MATLAB/R2021b/bin/matlab
 # Tudat installation specific variables
 tudat-bundle-dir := /mnt/nfs/home/lpedroso/tudat-bundle
 # Tudat app specific variables
-tudat-matlab-feedback-dir := ../src-tudat
+tudat-matlab-feedback-dir := ./tudat-matlab-thrust-feedback/src-tudat-matlab-thrust-feedback
 cpp-src := simulationConstellation.cpp
 matlab-feedback-src := DDELQRConstellationFeedback
 matlab-check-control-cycles := 5
@@ -30,7 +26,7 @@ run: tudat-app
 	rm -f ./output/*.dat
 	mkdir -p logs
 	xterm -e "$(matlab-exe) -nodisplay -nodesktop -nosplash -batch $(matlab-feedback-src) wait 2>&1 | tee logs/run-matlab-server.log && exit" &
-	sleep 10 && ./tudat-app 2>&1 | tee logs/run-tudat-app.log
+	sleep 15 && ./tudat-app 2>&1 | tee logs/run-tudat-app.log
 
 run-tudat: tudat-app
 	mkdir -p logs
