@@ -170,9 +170,9 @@ end
 
 %% References
 
-% [1] Pedroso, L., and Batista, P., 2022. "Novel discrete-time moving horizon 
-% estimation framework for decentralized filter design for large-scale
-% networks of interconnected systems" [not published yet]
+% [1] Pedroso, L., and Batista, P., 2022. "Decentralized discrete-time 
+% moving horizon estimation for large-scale networks of interconnected 
+% unconstrained linear systems" [not published yet]
 
 % [2] Pedroso, Leonardo, and Pedro Batista. 2021. "Efficient Algorithm for the 
 % Computation of the Solution to a Sparse Matrix Equation in Distributed Control 
