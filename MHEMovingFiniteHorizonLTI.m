@@ -1,4 +1,4 @@
-function [Kinf,Pinf] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
+function [Kinf,Pinf,P] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
 %% Description
 % This function computes the steady state decentralized moving finite
 % horizon steady-state sequence of gains according to [1]
@@ -13,8 +13,10 @@ function [Kinf,Pinf] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
 %               - maxIt: maximum number of iterations in Table 2. until convergence 
 %               - P0: initialization estimation error covariance matrix
 %               - verbose: display algorithm status messages
-% Output:   - Kinf: Wx1 cell of nxo steady-state sequence of gains gain matrix
+% Output:   - Kinf: Wx1 cell of nxo steady-state sequence of gain matrices
 %           - Pinf: steady state covariance matrix
+%           - P: Wx1 cell of nxn covariance matrices throught the window in
+%           the last iteration
 % Returns Kinf = NaN and Pinf = NaN if convergence could not be reached
 
 %% Argument handling
@@ -92,7 +94,7 @@ Pinf = P{end,1};
 end
 
 %% Compute a window of moving finite horizon gains 
-% Algorith in Table 1 [1]
+% Algorithm in Table 1 [1]
 function [K,P_end] = MovingFiniteHorizonGain(A,C,Q,R,E,w,epsl,P0,flag,K)
     n = size(A,2); % Get value of n from the size of A 
     P = cell(w,1); % Initialise cell to hold all covariance matrices
