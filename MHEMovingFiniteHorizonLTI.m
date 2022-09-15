@@ -1,4 +1,4 @@
-function [Kinf,Pinf,P] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
+function [Kinf,Pinf,Pseq] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
 %% Description
 % This function computes the steady state decentralized moving finite
 % horizon steady-state sequence of gains according to [1]
@@ -15,7 +15,7 @@ function [Kinf,Pinf,P] = MHEMovingFiniteHorizonLTI(A,C,Q,R,E,W,opts)
 %               - verbose: display algorithm status messages
 % Output:   - Kinf: Wx1 cell of nxo steady-state sequence of gain matrices
 %           - Pinf: steady state covariance matrix
-%           - P: Wx1 cell of nxn covariance matrices throught the window in
+%           - Pseq: (W+1)x1 cell of nxn covariance matrices throught the window in
 %           the last iteration
 % Returns Kinf = NaN and Pinf = NaN if convergence could not be reached
 
@@ -46,6 +46,7 @@ end
 
 % Initialize gain and covarinace over the moving window
 P = cell(W,1);
+Pseq = cell(W+1,1);
 Kinf = cell(W,1);
 
 % Table 2. in [1]
@@ -62,12 +63,12 @@ while true
             P_prevIt = P{end,1};
         end
     else
-        Paux = P{1,1};
+        Pseq{1,1} = P{1,1};
         for i = 1:w-1
             P{i,1} = P{i+1,1};
         end
         % Compute new sequence
-        [Kinf(1:w,1),P{end,1}] = MovingFiniteHorizonGain(A,C,Q,R,E,w,opts.epsl,Paux,0,Kinf);    
+        [Kinf(1:w,1),P{end,1},Pseq(2:W+1,1)] = MovingFiniteHorizonGain(A,C,Q,R,E,w,opts.epsl,Pseq{1,1},0,Kinf);    
         % Check convergence
         if abs(trace(P{end,1}-P_prevIt)/trace(P_prevIt)) < opts.epsl_inf
             if opts.verbose
@@ -95,7 +96,7 @@ end
 
 %% Compute a window of moving finite horizon gains 
 % Algorithm in Table 1 [1]
-function [K,P_end] = MovingFiniteHorizonGain(A,C,Q,R,E,w,epsl,P0,flag,K)
+function [K,P_end,P] = MovingFiniteHorizonGain(A,C,Q,R,E,w,epsl,P0,flag,K)
     n = size(A,2); % Get value of n from the size of A 
     P = cell(w,1); % Initialise cell to hold all covariance matrices
     if flag % if k < W_ss
