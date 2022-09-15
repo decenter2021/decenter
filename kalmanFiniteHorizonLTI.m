@@ -124,7 +124,7 @@ while  true % Outer loop
         fprintf("Outer-loop iteration %d finished.\n",counterOuterLoopIt);
         fprintf("Window convergence within %g.\n",min_rel_conv);
         fprintf("Maximum absolute CL eigenvalue: %g.\n",max(abs(eig((eye(n)-K{idx,1}*C)*A))));
-        fprintf("Trace: %g\n", trace(P{end,1}));
+        fprintf("Trace: %g\n", trace(P{idx,1}));
         fprintf("LTI gain convergence within %g.\n",abs(trace(Pinf)-trace(Pprev))/trace(Pprev));
     end
 
