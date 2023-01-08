@@ -38,11 +38,11 @@ error = cell(1,SimIt);
 error0 = transpose(mvnrnd(zeros(n,1),P0));
 for j = 1:SimIt
     if j == 1
-        error{1,j} = (eye(n)-K*C)*(A*error0+...
-            mvnrnd(zeros(n,1),Q)')-K*mvnrnd(zeros(o,1),R)';
+        error{1,j} = (eye(n)-Kinf*C)*(A*error0+...
+            mvnrnd(zeros(n,1),Q)')-Kinf*mvnrnd(zeros(o,1),R)';
     else
-        error{1,j} = (eye(n)-K*C)*(A*error{1,j-1}+...
-            mvnrnd(zeros(n,1),Q))'-K*mvnrnd(zeros(o,1),R)';
+        error{1,j} = (eye(n)-Kinf*C)*(A*error{1,j-1}+...
+            mvnrnd(zeros(n,1),Q))'-Kinf*mvnrnd(zeros(o,1),R)';
     end
 end
 
