@@ -48,22 +48,30 @@ end
 
 %% Gains computation    
 n = size(A,1); % Get value of n from the size of A 
+
 % Initialise Finite Horizon with One Step gain and covariance matrices
-[K,P] = OneStepSequenceLTI(A,C,Q,R,E,opts.W,opts.P0);
-%Z = vectorZ(vec(E)); % Compute matrix Z
+[K,P] = OneStepSequenceLTI(A,C,Q,R,E,opts.W,opts.P0,opts.verbose);
+
 Pprev = zeros(n,n); % Previous iteration
 Kinf = NaN;
+P0 = opts.P0;
 counterSteadyState = 0; % Counter for the number of iterations for which a steady-state solution was found
 counterOuterLoopIt = 0; % Counter for the number of outer loop iterations
 while  true % Outer loop
     counterOuterLoopIt = counterOuterLoopIt+1; % Increment number of outer loop iterations
+    if opts.verbose
+        fprintf("Outer-loop iteration %d.\n",counterOuterLoopIt);
+    end
     % Inner loop
     for i = opts.W:-1:1
+        if opts.verbose
+            fprintf("\tInner-loop iteration %d.\n",opts.W-i+1);
+        end
         % Update covariance matrix after the update step
         if i > 1 
-            P_ = A*P{i-1,1}*transpose(A)+Q;
+            P_ = A*P{i-1,1}*A'+Q;
         else
-            P_ = Q;
+            P_ = A*P0*A'+Q;
         end
         % Compute summation to obtain matrix Lambda
         Lambda = eye(n);
@@ -85,28 +93,41 @@ while  true % Outer loop
     % Recompute covariances 
     for i = 1:opts.W
         if i >1
-            P_ = A*P{i-1,1}*transpose(A)+Q;
+            P_ = A*P{i-1,1}*A'+Q;
         else
-            P_ = Q;
+            P_ = A*P0*A' + Q;
         end
         P{i,1} = K{i,1}*R*transpose(K{i,1})+...
           (eye(n)-K{i,1}*C)*P_*transpose(eye(n)-K{i,1}*C);
     end
+    
     % Find steady-state estimation error covariance for each outer loop
     % iteration. For a precision epsl between successive outer loop
     % iterations, a precision of at most epsl/10 is required for the
     % convergence of the outer loop iteration.
     Pinf = NaN;
+    rel_conv = zeros(opts.W,1);
+    rel_conv(1) = nan;
     for l = 2:opts.W
-        if abs(trace(P{l,1})-trace(P{l-1,1}))/trace(P{l-1,1}) < opts.epsl/10
-           Kinf = K{l,1};
-           Pinf = P{l,1};
-           % Increse number of times a steady-state solution was found
-           counterSteadyState = counterSteadyState+1; 
-           break; 
-        end
+        rel_conv(l) = abs(trace(P{l,1})-trace(P{l-1,1}))/trace(P{l-1,1});
     end
-    
+    [min_rel_conv, idx] = min(rel_conv);
+    if min_rel_conv < opts.epsl/10
+        % Increse number of times a steady-state solution was found within the
+        % minimum relative improvement
+        counterSteadyState = counterSteadyState+1;
+        Pinf = P{idx,1};
+        Kinf = K{idx,1}; 
+    end
+
+    if opts.verbose
+        fprintf("Outer-loop iteration %d finished.\n",counterOuterLoopIt);
+        fprintf("Window convergence within %g.\n",min_rel_conv);
+        fprintf("Maximum absolute CL eigenvalue: %g.\n",max(abs(eig((eye(n)-K{idx,1}*C)*A))));
+        fprintf("Trace: %g\n", trace(P{idx,1}));
+        fprintf("LTI gain convergence within %g.\n",abs(trace(Pinf)-trace(Pprev))/trace(Pprev));
+    end
+
     % Check if this iteration is within the tolerance
     if abs(trace(Pinf)-trace(Pprev))/trace(Pprev) < opts.epsl
         if opts.verbose
@@ -132,57 +153,15 @@ while  true % Outer loop
                 fprintf('Trying new window length W = %d\n',opts.W);
             end
             % Reinitialize finite-horizon with one-step gain and covariance matrices
-            [K,P] = OneStepSequenceLTI(A,C,Q,R,E,opts.W,opts.P0);
+            [K,P] = OneStepSequenceLTI(A,C,Q,R,E,opts.W,opts.P0,opts.verbose);
         end
     end
     Pprev = Pinf;
 end  
+
 end
 
 %% Auxiliary functions
-% Function that computes the vectorisation of a matrix
-% Input:    - in: matrix to be vectorised
-% Output:   - out: vec(in) 
-function out = vec(in)
-    out = zeros(size(in,2)*size(in,1),1);
-    for j = 1:size(in,2)
-       for i = 1:size(in,1)
-           out((j-1)*size(in,1)+i) = in(i,j);
-       end
-    end
-end
-
-% Function that returns a matrix given its vectorisation and number of rows
-% Input:    - in: vectorisation of a matrix
-%           - n: number of rows of the matrix whose vectorisation is
-%             input variable in
-% Output:   - out: matrix with n rows whose vectorisation is input variable
-%             in 
-function out = unvec(in,n)
-    out = zeros(n,size(in,1)/n);
-    for j = 1:size(in,1)
-       out(rem(j-1,n)+1, round(floor((j-1)/n))+1) = in(j); 
-    end
-end
-
-% Function which computes matrix Z such that Z*vec(K) contains the non-zero
-% elements of K according to the desired sparsity pattern
-% Input:    - vecE: the vectorisation of the matrix that defines the
-%             sparsity patern
-% Output:   - Z
-function Z = vectorZ(vecE)
-    vecE = vecE~=0; % Normalise the sparsity pattern to a logical array
-    Z = zeros(sum(vecE),size(vecE,1)); % Initialise matrix Z
-    nZeros = 0;
-    for i = 1:size(vecE,1)
-       if vecE(i) ~= 0
-           Z(i-nZeros,i) = 1; 
-       else
-           nZeros = nZeros+1;
-       end     
-    end
-end
-
 
 % This function computes the sequence of Kalman filter gains for a window
 % using the one-step method
@@ -191,13 +170,19 @@ end
 %           - w: window size
 % Output:   - Kinf: wx1 cell of gain matrices 
 %           - Pinf: wx1 cell of estimation erro covariance matrices
-function [K,P] = OneStepSequenceLTI(A,C,Q,R,E,w,P0)
+function [K,P] = OneStepSequenceLTI(A,C,Q,R,E,w,P0,verbose)
 %% Gain computation
 n = size(A,1); % Get value of n from the size of A 
-o = size(C,1); % Get value of o from the size of C 
+% o = size(C,1); % Get value of o from the size of C 
 K = cell(w,1);
 P = cell(w,1);
+if verbose
+    fprintf("Outer-loop initialization.\n");
+end
 for l = 1:w
+    if verbose
+        fprintf("\tOuter-loop initialization iteration: %d.\n",l);
+    end
     % Update the covariance of the update step, P_. P is the covariance 
     % matrix after the filtering step.
     if l == 1
@@ -205,22 +190,8 @@ for l = 1:w
     else
         P_ = A*P{l-1,1}*transpose(A)+Q;
     end
-    % Initialise gain matrix 
-    K{l,1} = zeros(n,o);
-    % Summation to compute the gain
-    for i = 1:n
-        L = zeros(n);
-        L (i,i) = 1; % Generate matrix L_i
-        M = zeros(o);
-        for k = 1:o % Gererate matrix M_i
-           if E(i,k) ~= 0
-               M(k,k) = 1;
-           end
-        end
-        % Compute the ith term of the summation 
-        K{l,1} = K{l,1} + (L*P_*transpose(C)*M)/...
-            (eye(o)-M+M*(C*P_*transpose(C)+R)*M);
-    end
+    % Compute gain
+    K{l,1} = sparseEqSolver(eye(n),C*P_*C'+R,P_*C',E);
     % Update the covariance matrix after the filtering step
     P{l,1} = K{l,1}*R*transpose(K{l,1})+...
         (eye(n)-K{l,1}*C)*P_*transpose(eye(n)-K{l,1}*C);
