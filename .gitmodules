@@ -1,0 +1,6 @@
+[submodule "Examples/DistributedDecentralizedRHCStarlink/tudat-matlab-thrust-feedback"]
+	path = Examples/DistributedDecentralizedRHCStarlink/tudat-matlab-thrust-feedback
+	url = https://github.com/decenter2021/tudat-matlab-thrust-feedback/
+[submodule "Examples/DistributedDecentralizedRHCStarlink/osculating2mean"]
+	path = Examples/DistributedDecentralizedRHCStarlink/osculating2mean
+	url = https://github.com/decenter2021/osculating2mean
