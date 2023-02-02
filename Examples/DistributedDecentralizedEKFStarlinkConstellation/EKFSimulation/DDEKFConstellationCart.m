@@ -9,9 +9,11 @@ numberOfSatellitesPerPlane = 22;
 % Maximum communication distance normalized by the arc length between
 % staellites on the same orbit
 ISLRange = 750e3;
+minInNeighbourhood = 1;
+maxInNeighbourhood = 3;
 semiMajorAxis = 6921000;
-% Number of satellites
 
+% Number of satellites
 N = numberOfPlanes*numberOfSatellitesPerPlane;
 
 % Init dimensions of the dynamics of each satellite
@@ -21,10 +23,10 @@ fprintf("Constellation defined.\n");
 
 %% Simulation
 Ts = 1; % Sampling time (s)
-Tsim = 10;%5730;
+Tsim = 5730;
 ItSim = Tsim/Ts+1; % One week
 % Load true data 
-load('./data/output_2022_01_22.mat','x');
+load('./data/output_orb_2023_01_15.mat','x');
 
 % Reduce dimension of imported data arrays
 parfor i = 1:N
@@ -85,7 +87,7 @@ trace_log = zeros(N,ItSim-1);
 P_pos_log = zeros(N,ItSim-1,3);
 
 %% Filter simulation - filter iterations
-fprintf("Simulating DEKF.\n");
+fprintf("Simulating DDEKF.\n");
 fprintf("Iteration: %08d/%08d",1,ItSim);
 
 for t = 1:ItSim-1
@@ -119,12 +121,19 @@ for t = 1:ItSim-1
         aux(:,i) = x_t1(:,i);
     end
     parfor i = 1:N
-        FimNew{i,1} = LEOConstellationMeasurementGraph(i,aux,ISLRange); 
+        % Before limited number of neighbors
+        % FimNew{i,1} = LEOConstellationMeasurementGraph(i,aux,ISLRange); 
+        % After limited number of neighbors
+        FimNew{i,1} = LEOConstellationMeasurementGraph_limited(i,aux,ISLRange);
     end
 
     %% Step 3,4 - Communication
     %% Step 5 - Topology synch
-    FimNew = LEOConstellationMeasurementGraphSynch(FimNew);
+    % Before limited number of neighbors
+    FimNew = LEOConstellationMeasurementGraphSynch(FimNew);    
+    % After limited number of neighbors
+    %FimNew = LEOConstellationMeasurementGraphSynch_limited(FimNew,minInNeighbourhood,maxInNeighbourhood);
+
     %% Step 6 - Update filtered covariance
     % P(t|t)
     if t > 1
@@ -613,6 +622,7 @@ end
 
 %% Auxiliary functions - topology
 
+%%%%% Before limit %%%%%
 % Compute measurment graph
 function Fim = LEOConstellationMeasurementGraph(i,x_hat,separation) 
     % In neighborhood 
@@ -626,6 +636,69 @@ end
 
 function Fim = LEOConstellationMeasurementGraphSynch(Fim)
 
+end
+
+%%%%% After limit %%%%%
+
+% Compute measurment graph
+function Fim = LEOConstellationMeasurementGraph_limited(i,x_hat,separation) 
+    Fim = [];
+    for j = 1:size(x_hat,2)
+        if norm(x_hat(1:3,j)-x_hat(1:3,i)) < separation
+            Fim = [Fim;j];
+        end
+    end
+end
+
+function Fim = LEOConstellationMeasurementGraphSynch_limited(Fim,minInNeighbourhood,maxInNeighbourhood)
+    for i = 1:size(Fim,1)
+        excess_neighbourhood = size(Fim{i,1},1) - (maxInNeighbourhood +1);
+        if excess_neighbourhood > 0
+            Fim_i_old = zeros(size(Fim{i,1},1),2);
+            for j_idx = 1:size(Fim{i,1},1)
+                Fim_i_old(j_idx,1) = Fim{i,1}(j_idx);
+                Fim_i_old(j_idx,2) = size(Fim{Fim{i,1}(j_idx),1},1);
+            end
+            Fim_i_old = sortrows(Fim_i_old,2,'descend');
+            for j = Fim_i_old(:,1)'
+                if j ~= i && size(Fim{j,1},1) > minInNeighbourhood+1 % at least one neighbour
+                    % Remove edge
+                    Fim{i,1} = Fim{i,1}(Fim{i,1}~= j);
+                    Fim{j,1} = Fim{j,1}(Fim{j,1}~= i);
+                    excess_neighbourhood = excess_neighbourhood -1;
+                end
+                % Break if enough edges have neen removed
+                if excess_neighbourhood <= 0, break; end
+            end
+            % If it it not possible to enfore the minimum constraint
+            if excess_neighbourhood > 0
+                fprintf("Unable to satisfy constraints for sat %d - resulting excess %d\n",i,excess_neighbourhood);
+            
+                Fim_i_old = zeros(size(Fim{i,1},1),2);
+                for j_idx = 1:size(Fim{i,1},1)
+                    Fim_i_old(j_idx,1) = Fim{i,1}(j_idx);
+                    Fim_i_old(j_idx,2) = size(Fim{Fim{i,1}(j_idx),1},1);
+                end
+                Fim_i_old = sortrows(Fim_i_old,2,'descend');
+                for j = Fim_i_old(:,1)'
+                    if j ~= i && size(Fim{j,1},1) > (minInNeighbourhood+1)-1 % at least one neighbour
+                        % Remove edge
+                        Fim{i,1} = Fim{i,1}(Fim{i,1}~= j);
+                        Fim{j,1} = Fim{j,1}(Fim{j,1}~= i);
+                        excess_neighbourhood = excess_neighbourhood -1;
+                    end
+                    % Break if enough edges have neen removed
+                    if excess_neighbourhood <= 0, break; end
+                end
+            end
+
+            if excess_neighbourhood > 0
+                fprintf("Fatally unable to satisfy relaxed constraints for sat %d - resulting excess %d\n",i,excess_neighbourhood);
+                error("Infeasible coupling.");
+            end
+
+        end     
+    end 
 end
 
 
