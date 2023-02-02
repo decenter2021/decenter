@@ -1,6 +1,8 @@
 %% Plots for DEKFConstellation Cart
+
 %% Init
 sat = 1;
+
 %% Plot cartesian error with 3 sigma bounds
 T = size(error{sat,1},2)-1;
 figure('Position',[0 0 1000 500]);
@@ -30,12 +32,15 @@ grid on;
 set(gca,'FontSize',15)
 xlabel('$t (\mathrm{s})$','Interpreter','latex');
 
+yyaxis right
+ylim([0 6])
+plot(0:T-1,no_sats,'LineWidth',2)
+ylabel("$|\mathcal{D}_1^-|-1$",'Interpreter','latex')
 yyaxis left;
 plot(0:T-1,trace_log(sat,1:end),'LineWidth',3)
 ylabel(sprintf('$\\mathrm{tr}\\left(\\mathbf{P}_{i,(i,i)}(t)\\right)\\;$ [Sattelite \\#%05d]',sat),'Interpreter','latex')
-yyaxis right
-plot(0:T-1,no_sats,'LineWidth',3)
-ylabel(sprintf('Number of satellites within ISL range'),'Interpreter','latex')
+xlim([0 5731])
+ylim([0 50])
 hold off
 
 %% RMSE 

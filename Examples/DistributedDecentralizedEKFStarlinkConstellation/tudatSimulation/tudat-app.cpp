@@ -1,9 +1,14 @@
+/*Package: tudat-matlab-thrust-feedback
+* Author: Leonardo Pedroso
+*/
+
 // ---------- Headers ----------
 // Standard headers
 #include <ctime>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <fstream>
 
 // Boost headers
 #include <boost/random/mersenne_twister.hpp>
@@ -20,8 +25,8 @@
 
 // User defined libraries
 #include "applicationOutput.h" // Minor changes in relation to the file available in tudat examples
-#include "simulationParameters.h" 
 #include "tudatThrustFeedbackMatlab.h"
+#include "tudat-matlab-parameters.h" 
 
 
 // ---------- Main application ----------
@@ -66,6 +71,7 @@ int main(){
         bodiesToCreate.push_back("Moon");
         bodiesToCreate.push_back("Mars");
         bodiesToCreate.push_back("Venus");
+        bodiesToCreate.push_back("Jupiter");
         
 
         // Create settings for objects (key-value pairs)
@@ -123,7 +129,7 @@ int main(){
         // --------------------------------------------------------
         // ---------- Define constellation initial state ----------
         // --------------------------------------------------------
-        // Set orbital parameters of Galileo constellation.
+        // Set orbital parameters of constellation.
         const double semiMajorAxis = CONSTELLATION_SMA;
         const double eccentricity = CONSTELLATION_ECC;
         const double inclination = CONSTELLATION_INC;
@@ -168,6 +174,37 @@ int main(){
         for (unsigned int i = 0; i < numberOfSatellites; i++ ){
                 systemIterationInitialState.segment( i * sizeOfState, sizeOfState ) = initialConditions.col( i );
         }
+        Eigen::Matrix<double,numberOfSatellites,1> systemIterationInitialBodyMasses;     
+        double aux;
+        for (unsigned int i = 0; i < numberOfSatellites; i++ ){
+        	systemIterationInitialBodyMasses(i,0) = SAT_MASS;
+        }
+        
+        /*
+        // Load x0 from txt file
+        //std::ofstream x0file_;
+        std::string filepath(X0_FILE_PATH);
+        
+        // Open file
+    	//x0file_.open(X0_FILE_PATH,std::ios::in);
+    	std::ifstream x0file_(filepath);
+    	// Initial state vectors
+        Eigen::Matrix<double,Eigen::Dynamic,1> systemIterationInitialState = Eigen::MatrixXd::Zero(sizeOfState * numberOfSatellites,1);
+        Eigen::Matrix<double,numberOfSatellites,1> systemIterationInitialBodyMasses;     
+        double aux;
+        for (unsigned int i = 0; i < numberOfSatellites; i++ ){
+        	// Initial position + velocity in cartesian coordinates
+        	for (unsigned int j = 0; j < sizeOfState; j++ ){
+        		x0file_ >> aux;
+        		systemIterationInitialState(i*sizeOfState+j,0) = aux;
+        	}
+        	// Initial mass
+        	x0file_ >> aux;
+        	systemIterationInitialBodyMasses(i,0) = aux;
+        }
+        // Close file
+        x0file_.close();*/
+        
         
         // -----------------------------------------------
         // ---------- Setup acceleration models ----------
@@ -180,7 +217,7 @@ int main(){
 
         // ----------- Thrust feedback
         // 4 evaluations per interval in RK4s
-        std::shared_ptr <tudatThrustFeedbackMatlab> ttfm = std::make_shared <tudatThrustFeedbackMatlab>(numberOfSatellites,EPOCH_CONTROL_UPDATE,5*EPOCH_CONTROL_UPDATE/EPOCH_SAMPLE,SAT_ISP*SAT_g0,simulationEndEpoch);
+        std::shared_ptr <tudatThrustFeedbackMatlab> ttfm = std::make_shared <tudatThrustFeedbackMatlab>(SERVER_PORT,numberOfSatellites,EPOCH_CONTROL_UPDATE,5*EPOCH_CONTROL_UPDATE/EPOCH_SAMPLE,SAT_ISP*SAT_g0,simulationEndEpoch);
 
         // Create acceleration models
         // Set accelerations for each satellite.
@@ -188,13 +225,14 @@ int main(){
                 currentSatelliteName = "sat" + boost::lexical_cast< std::string >( i );
                 std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > accelerationsOfCurrentSatellite;
                 // Central gravity + Spherical Harmonics + Atmosferic drag 
-                accelerationsOfCurrentSatellite["Earth"] = {sphericalHarmonicAcceleration( 12, 12 ),aerodynamicAcceleration()};
+                accelerationsOfCurrentSatellite["Earth"] = {sphericalHarmonicAcceleration( 24, 24 ),aerodynamicAcceleration()};
                 // Solar radiation pressure
                 accelerationsOfCurrentSatellite["Sun"] = {pointMassGravityAcceleration(),cannonBallRadiationPressureAcceleration( )};
                 // Third body gravity
                 accelerationsOfCurrentSatellite["Moon"] = {pointMassGravityAcceleration()};
                 accelerationsOfCurrentSatellite["Mars"] = {pointMassGravityAcceleration()};
                 accelerationsOfCurrentSatellite["Venus"] = {pointMassGravityAcceleration()};    
+                accelerationsOfCurrentSatellite["Jupiter"] = {pointMassGravityAcceleration()}; 
                 
                 //Thrust - Custom function                              
                 std::function <Eigen::Vector3d(const double)> thrustFeedback = std::bind(&tudatThrustFeedbackMatlab::thrustFeedbackWrapper, ttfm, std::placeholders::_1,i,bodyMap.getMap());
@@ -229,14 +267,14 @@ int main(){
         // Create mass rate models
         std::map< std::string, std::shared_ptr< basic_astrodynamics::MassRateModel > > massRateModels;
         std::vector< std::string > bodiesWithMassToPropagate;
-        Eigen::Matrix<double,numberOfSatellites,1> systemIterationInitialBodyMasses;
+        //Eigen::Matrix<double,numberOfSatellites,1> systemIterationInitialBodyMasses;
         for ( unsigned int i = 0; i < numberOfSatellites; i++ ){
                 currentSatelliteName = "sat" + boost::lexical_cast< std::string >( i );
                 //Mass rate for 6 thrusters aligned with TWN frame axis - Custom function                             
                 std::function <double(double)> massRateThrustFeedback= std::bind(&tudatThrustFeedbackMatlab::massRateThrustFeedbackWrapper, ttfm, std::placeholders::_1,i,bodyMap.getMap());
                 massRateModels[currentSatelliteName] = createMassRateModel(currentSatelliteName, std::make_shared< CustomMassRateSettings >( massRateThrustFeedback ),bodyMap,accelerationModelMap);
                 bodiesWithMassToPropagate.push_back(currentSatelliteName);
-                systemIterationInitialBodyMasses(i,0) = SAT_MASS*1.0;
+                //systemIterationInitialBodyMasses(i,0) = SAT_MASS*1.0;
         } 
         // Create settings for propagating the mass of the vehicle
         std::shared_ptr< MassPropagatorSettings< double > > massPropagatorSettings = std::make_shared< MassPropagatorSettings< double > >(bodiesWithMassToPropagate, massRateModels,systemIterationInitialBodyMasses,terminationSettings);
