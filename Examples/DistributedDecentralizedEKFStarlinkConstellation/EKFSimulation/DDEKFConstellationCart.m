@@ -23,7 +23,7 @@ fprintf("Constellation defined.\n");
 
 %% Simulation
 Ts = 1; % Sampling time (s)
-Tsim = 3;%5730;
+Tsim = 5730;
 ItSim = Tsim/Ts+1; % One week
 % Load true data 
 load('./data/output_orb_2023_01_15.mat','x');
